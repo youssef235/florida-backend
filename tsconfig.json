@@ -4,17 +4,18 @@
     "target": "ES2021",
     "outDir": "./dist",
     "rootDir": "src",
-    "incremental": false, // تعطيل هذا مؤقتاً
+    "incremental": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
+    "types": ["node"],  // <--- ضيف السطر ده هنا
     "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts"], // تحديد الامتداد بدقة
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }

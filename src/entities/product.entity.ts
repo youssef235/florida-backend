@@ -11,6 +11,7 @@ import {
 
 import { Category } from './category.entity';
 import { PriceTag } from './price-tag.entity';
+import { User } from './user.entity';
 
 @Entity('products')
 export class Product {
@@ -25,16 +26,20 @@ export class Product {
 
   @Column({ type: 'text', array: true })
   images!: string[];
-
-  @ManyToMany(() => Category, (category) => category.products)
-  @JoinTable({ name: 'product_categories' })
-  categories!: Category[];
+@ManyToMany(() => Category, (category) => category.products)
+@JoinTable({
+  name: 'product_categories',
+  joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+})
+categories!: Category[];
 
   @OneToMany(() => PriceTag, (priceTag) => priceTag.product, { cascade: true })
   priceTags!: PriceTag[];
 
-  // 🔥 NEW FIELDS (مهمة جدًا للهوم + الفلترة)
-
+  // =====================
+  // FEATURE FLAGS
+  // =====================
   @Column({ type: 'boolean', default: false })
   isFeatured!: boolean;
 
@@ -44,7 +49,17 @@ export class Product {
   @Column({ type: 'varchar', nullable: true })
   season!: 'summer' | 'winter' | null;
 
-  // 📅 تواريخ (موجودة عندك)
+  // =====================
+  // ❤️ WISHLIST USERS
+  // =====================
+@ManyToMany(() => User, (user) => user.wishlist)
+@JoinTable({
+  name: 'wishlist',
+  joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+})
+wishlistUsers!: User[];
+
   @CreateDateColumn()
   createdAt!: Date;
 

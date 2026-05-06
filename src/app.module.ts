@@ -22,6 +22,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { BannerModule } from './modules/banner/banner.module'; 
+import { WishlistModule } from './modules/products/Wishlist Module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { BannerModule } from './modules/banner/banner.module';
     DeliveryInfoModule,
     OrdersModule,
     AdminModule,
+    WishlistModule,
 
     BannerModule, // 👈 هنا الإضافة الأساسية
   ],

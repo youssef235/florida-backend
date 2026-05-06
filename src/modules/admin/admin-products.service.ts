@@ -27,53 +27,38 @@ export class AdminProductsService {
     private readonly priceTagsRepository: Repository<PriceTag>,
   ) {}
 
-  async list(query: ProductQuery) {
-    const page = Number(query.page ?? 0) || 0;
-    const pageSize = Number(query.pageSize ?? 10) || 10;
-    const keyword = (query.keyword ?? '').trim();
+async list(query: ProductQuery) {
+  const page = Number(query.page ?? 0) || 0;
+  const pageSize = Number(query.pageSize ?? 10) || 10;
 
-    let categoryIds: string[] = [];
-    if (query.categories) {
-      try {
-        const parsed = JSON.parse(query.categories);
-        if (Array.isArray(parsed)) {
-          categoryIds = parsed.filter(Boolean);
-        }
-      } catch (_) {
-        categoryIds = [];
-      }
-    }
+  const qb = this.productsRepository
+    .createQueryBuilder('product')
+    .leftJoinAndSelect('product.priceTags', 'priceTags')
+    .leftJoinAndSelect('product.categories', 'categories')
+    .orderBy('product.createdAt', 'DESC')
+    .skip(page * pageSize)
+    .take(pageSize);
 
-    const qb = this.productsRepository
-      .createQueryBuilder('product')
-      .leftJoinAndSelect('product.priceTags', 'priceTags')
-      .leftJoinAndSelect('product.categories', 'categories')
-      .distinct(true);
-
-    if (keyword) {
-      qb.where('LOWER(product.name) LIKE :keyword', {
-        keyword: `%${keyword.toLowerCase()}%`,
-      });
-    }
-
-    if (categoryIds.length > 0) {
-      qb.andWhere('categories.id IN (:...categoryIds)', { categoryIds });
-    }
-
-    qb.orderBy('product.createdAt', 'DESC').skip(page * pageSize).take(pageSize);
-
-    const [products, total] = await qb.getManyAndCount();
-
-    return {
-      meta: {
-        page,
-        pageSize,
-        total,
-      },
-      data: products.map(mapProduct),
-    };
+  if (query.keyword) {
+    qb.andWhere('LOWER(product.name) LIKE :keyword', {
+      keyword: `%${query.keyword.toLowerCase()}%`,
+    });
   }
 
+  if (query.categories) {
+    const ids = JSON.parse(query.categories || '[]');
+    if (ids.length > 0) {
+      qb.andWhere('categories.id IN (:...ids)', { ids });
+    }
+  }
+
+  const [products, total] = await qb.getManyAndCount();
+
+  return {
+    meta: { page, pageSize, total },
+    data: products.map(mapProduct),
+  };
+}
   async findOne(id: string) {
     const product = await this.productsRepository.findOne({
       where: { id },

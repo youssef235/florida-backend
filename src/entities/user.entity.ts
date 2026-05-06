@@ -5,12 +5,15 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 import { CartItem } from './cart-item.entity';
 import { DeliveryInfo } from './delivery-info.entity';
 import { Order } from './order.entity';
 import { UserRole } from '../common/enums/user-role.enum';
+import { Product } from './product.entity';
 
 @Entity('users')
 export class User {
@@ -32,14 +35,34 @@ export class User {
   @Column({ type: 'varchar', length: 20, default: UserRole.CUSTOMER })
   role!: UserRole;
 
+  // =====================
+  // DELIVERY
+  // =====================
   @OneToMany(() => DeliveryInfo, (deliveryInfo) => deliveryInfo.user)
   deliveryInfos!: DeliveryInfo[];
 
+  // =====================
+  // CART
+  // =====================
   @OneToMany(() => CartItem, (cartItem) => cartItem.user)
-  cartItems!  : CartItem[];
+  cartItems!: CartItem[];
 
+  // =====================
+  // ORDERS
+  // =====================
   @OneToMany(() => Order, (order) => order.user)
   orders!: Order[];
+
+  // =====================
+  // ❤️ WISHLIST
+  // =====================
+  @ManyToMany(() => Product, (product) => product.wishlistUsers)
+  @JoinTable({
+    name: 'wishlist',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  })
+  wishlist!: Product[];
 
   @CreateDateColumn()
   createdAt!: Date;
