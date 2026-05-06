@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2021",
+    "outDir": "./dist",
+    "rootDir": "src",
+    "incremental": false, // تعطيل هذا مؤقتاً
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"], // تحديد الامتداد بدقة
+  "exclude": ["node_modules", "dist", "test"]
+}

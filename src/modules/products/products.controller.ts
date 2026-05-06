@@ -1,0 +1,19 @@
+import { Controller, Get, Param, Query } from '@nestjs/common';
+
+import { ProductsService } from './products.service';
+
+@Controller('products')
+export class ProductsController {
+  constructor(private readonly productsService: ProductsService) {}
+
+  @Get()
+  async getProducts(@Query() query: Record<string, string>) {
+    return this.productsService.getProducts(query);
+  }
+
+
+  @Get(':id')
+async getProduct(@Param('id') id: string) {
+  return await this.productsService.getProductById(id);
+}
+}
