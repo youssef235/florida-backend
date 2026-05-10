@@ -1,0 +1,687 @@
+<!-- PRODUCT MODAL -->
+<div class="modal hidden" id="product-modal">
+
+  <div class="modern-modal">
+
+    <!-- HEADER -->
+    <div class="modern-modal-header">
+
+      <div>
+        <h2 id="modal-title">
+          إضافة منتج جديد
+        </h2>
+
+        <p>
+          قم بإضافة بيانات المنتج بشكل واضح ومنظم
+        </p>
+      </div>
+
+      <button
+        class="close-modal"
+        id="close-product-modal"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <!-- FORM -->
+    <form id="product-form" class="modern-form">
+
+      <input
+        type="hidden"
+        name="productId"
+      />
+
+      <!-- BASIC INFO -->
+      <div class="card-section">
+
+        <div class="section-title">
+          <i class="fa-solid fa-box"></i>
+          المعلومات الأساسية
+        </div>
+
+        <div class="form-grid">
+
+          <label class="input-group">
+            <span>
+              اسم المنتج
+              <span class="required">*</span>
+            </span>
+
+            <input
+              type="text"
+              name="name"
+              required
+              placeholder="مثال: تيشيرت قطن"
+            />
+          </label>
+
+          <label class="input-group">
+            <span>
+              الموسم
+            </span>
+
+            <select name="season">
+              <option value="summer">صيف</option>
+              <option value="winter">شتاء</option>
+              <option value="spring">ربيع</option>
+              <option value="autumn">خريف</option>
+            </select>
+
+          </label>
+
+        </div>
+
+        <label class="input-group mt-3">
+
+          <span>
+            وصف المنتج
+          </span>
+
+          <textarea
+            name="description"
+            rows="5"
+            placeholder="اكتب وصفًا احترافيًا للمنتج..."
+          ></textarea>
+
+        </label>
+
+      </div>
+
+      <!-- SIZES -->
+      <div class="card-section">
+
+        <div class="section-title">
+          <i class="fa-solid fa-ruler-combined"></i>
+          المقاسات المتاحة
+        </div>
+
+        <div class="quick-select">
+
+          <button type="button" onclick="addCommonSize('XS')">XS</button>
+          <button type="button" onclick="addCommonSize('S')">S</button>
+          <button type="button" onclick="addCommonSize('M')">M</button>
+          <button type="button" onclick="addCommonSize('L')">L</button>
+          <button type="button" onclick="addCommonSize('XL')">XL</button>
+          <button type="button" onclick="addCommonSize('XXL')">XXL</button>
+
+        </div>
+
+        <div
+          id="sizes-input"
+          class="chips"
+        ></div>
+
+      </div>
+
+      <!-- COLORS -->
+      <div class="card-section">
+
+        <div class="section-title">
+          <i class="fa-solid fa-palette"></i>
+          ألوان المنتج
+        </div>
+
+        <div class="color-picker-wrapper">
+
+          <input
+            type="text"
+            id="color-name"
+            placeholder="اسم اللون..."
+            class="color-name-input"
+          />
+
+          <input
+            type="color"
+            id="color-hex"
+            value="#29c7ac"
+          />
+
+          <button
+            type="button"
+            onclick="addColor()"
+            class="primary-btn"
+          >
+            <i class="fa-solid fa-plus"></i>
+            إضافة لون
+          </button>
+
+        </div>
+
+        <div
+          id="colors-preview"
+          class="chips mt-3"
+        ></div>
+
+      </div>
+
+      <!-- PRICES -->
+      <div class="card-section">
+
+        <div class="section-title">
+          <i class="fa-solid fa-tags"></i>
+          الأسعار والعروض
+        </div>
+
+        <div id="price-tags-container"></div>
+
+        <button
+          type="button"
+          onclick="addPriceRow()"
+          class="btn-secondary mt-3"
+        >
+          <i class="fa-solid fa-plus"></i>
+          إضافة سعر جديد
+        </button>
+
+      </div>
+
+      <!-- FEATURED -->
+      <div class="card-section">
+
+        <label class="checkbox-row">
+
+          <div class="checkbox-content">
+
+            <div class="checkbox-icon">
+              <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+              <h5>
+                منتج مميز
+              </h5>
+
+              <p>
+                سيظهر في قسم المنتجات المميزة داخل الموقع
+              </p>
+            </div>
+
+          </div>
+
+          <input
+            type="checkbox"
+            name="isFeatured"
+          />
+
+        </label>
+
+      </div>
+
+      <!-- IMAGES -->
+      <div class="card-section">
+
+        <div class="section-title">
+          <i class="fa-solid fa-images"></i>
+          صور المنتج
+        </div>
+
+        <label class="upload-box">
+
+          <input
+            type="file"
+            id="product-images"
+            multiple
+            accept="image/*"
+            hidden
+          />
+
+          <div class="upload-content">
+
+            <div class="upload-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+
+            <h4>
+              اسحب الصور هنا أو اضغط للرفع
+            </h4>
+
+            <p>
+              PNG, JPG, WEBP
+            </p>
+
+          </div>
+
+        </label>
+
+        <div
+          id="image-preview"
+          class="image-preview"
+        ></div>
+
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="primary-btn save-btn"
+        >
+          <i class="fa-solid fa-floppy-disk"></i>
+          حفظ المنتج
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- STYLE -->
+<style>
+
+:root{
+  --primary: #29c7ac;
+  --primary-dark: #17a58d;
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 10px 35px rgba(0,0,0,0.08);
+  --radius: 22px;
+}
+
+.modal{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  z-index: 9999;
+}
+
+.hidden{
+  display: none;
+}
+
+.modern-modal{
+  width: 100%;
+  max-width: 980px;
+  max-height: 94vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  animation: modalFade .25s ease;
+}
+
+@keyframes modalFade{
+  from{
+    opacity: 0;
+    transform: translateY(20px) scale(.96);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modern-modal::-webkit-scrollbar{
+  width: 8px;
+}
+
+.modern-modal::-webkit-scrollbar-thumb{
+  background: #d1d5db;
+  border-radius: 50px;
+}
+
+.modern-modal-header{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: white;
+  padding: 24px 30px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modern-modal-header h2{
+  margin: 0;
+  font-size: 28px;
+  color: var(--text);
+}
+
+.modern-modal-header p{
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.close-modal{
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  transition: .2s;
+  font-size: 18px;
+}
+
+.close-modal:hover{
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.modern-form{
+  padding: 28px;
+}
+
+.card-section{
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #edf0f5;
+  box-shadow: 0 4px 20px rgba(0,0,0,.03);
+}
+
+.section-title{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.section-title i{
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(41,199,172,.12);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+  gap: 20px;
+}
+
+.input-group{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-group span{
+  font-weight: 600;
+  color: var(--text);
+}
+
+input[type="text"],
+textarea,
+select{
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 15px;
+  transition: .2s;
+  outline: none;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(41,199,172,.12);
+}
+
+textarea{
+  resize: vertical;
+}
+
+.required{
+  color: #ef4444;
+}
+
+.quick-select{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.quick-select button{
+  border: none;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: .2s;
+}
+
+.quick-select button:hover{
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.color-picker-wrapper{
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px dashed #dbe3ec;
+}
+
+.color-name-input{
+  flex: 1;
+  min-width: 220px;
+}
+
+input[type="color"]{
+  width: 65px;
+  height: 52px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.primary-btn,
+.btn-secondary{
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 14px 22px;
+  font-weight: 700;
+  transition: .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-btn{
+  background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color: white;
+  box-shadow: 0 10px 20px rgba(41,199,172,.25);
+}
+
+.primary-btn:hover{
+  transform: translateY(-2px);
+}
+
+.btn-secondary{
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.btn-secondary:hover{
+  transform: translateY(-2px);
+}
+
+.checkbox-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.checkbox-content{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.checkbox-icon{
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: rgba(251,191,36,.15);
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.checkbox-content h5{
+  margin: 0;
+  font-size: 18px;
+}
+
+.checkbox-content p{
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+input[type="checkbox"]{
+  width: 24px;
+  height: 24px;
+  accent-color: var(--primary);
+}
+
+.upload-box{
+  border: 2px dashed #cbd5e1;
+  border-radius: 24px;
+  padding: 40px;
+  background: linear-gradient(to bottom,#ffffff,#f8fafc);
+  cursor: pointer;
+  transition: .25s;
+  display: block;
+}
+
+.upload-box:hover{
+  border-color: var(--primary);
+  background: #f0fdfa;
+}
+
+.upload-content{
+  text-align: center;
+}
+
+.upload-icon{
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: rgba(41,199,172,.12);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto auto 18px;
+  font-size: 34px;
+}
+
+.upload-content h4{
+  margin: 0;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.upload-content p{
+  margin-top: 10px;
+  color: var(--muted);
+}
+
+.image-preview{
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+  gap: 16px;
+}
+
+.form-actions{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.save-btn{
+  min-width: 220px;
+  justify-content: center;
+  font-size: 16px;
+  padding: 16px 24px;
+}
+
+.mt-3{
+  margin-top: 16px;
+}
+
+.mt-4{
+  margin-top: 24px;
+}
+
+@media(max-width:768px){
+
+  .modern-modal{
+    border-radius: 20px;
+  }
+
+  .modern-modal-header{
+    padding: 18px;
+  }
+
+  .modern-form{
+    padding: 18px;
+  }
+
+  .card-section{
+    padding: 18px;
+  }
+
+  .checkbox-row{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-actions{
+    justify-content: stretch;
+  }
+
+  .save-btn{
+    width: 100%;
+  }
+
+}
+
+</style>

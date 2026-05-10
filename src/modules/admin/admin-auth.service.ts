@@ -38,4 +38,15 @@ export class AdminAuthService {
       user: mapAdminUser(user),
     };
   }
+
+  // ✅ بيرجع بيانات الأدمن الحالي من الـ JWT
+  async me(user: User) {
+    const found = await this.usersRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!found) throw new UnauthorizedException();
+
+    return mapAdminUser(found);
+  }
 }

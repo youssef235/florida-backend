@@ -1,0 +1,11 @@
+:root{
+  --bg:#0f1722;
+  --card:#151f2d;
+  --card2:#1c2737;
+  --border:rgba(255,255,255,0.08);
+  --text:#ffffff;
+  --muted:#8fa1b5;
+  --primary:#29c7ac;
+  --danger:#ff5d5d;
+  --radius:22px;
+}

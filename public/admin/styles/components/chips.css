@@ -1,0 +1,140 @@
+.small-title{
+  margin-bottom:10px;
+}
+
+/* chips */
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:15px;
+}
+
+.chip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--primary);
+  color:#000;
+  padding:8px 16px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  animation:fadeIn 0.3s ease;
+}
+
+.color-chip{
+  background:#253346;
+  color:white;
+  border:1px solid var(--border);
+}
+
+/* remove button */
+.remove-btn{
+  cursor:pointer;
+  background:rgba(0,0,0,0.1);
+  width:20px;
+  height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  font-size:16px;
+  transition:0.2s;
+}
+
+.remove-btn:hover{
+  background:var(--danger);
+  color:white;
+}
+
+/* quick size select */
+.quick-select{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+  gap:12px;
+
+  background:rgba(255,255,255,0.02);
+
+  padding:20px;
+  border-radius:18px;
+  border:1px solid var(--border);
+}
+
+.quick-select button{
+  height:65px;
+  font-size:18px;
+  font-weight:700;
+  text-transform:uppercase;
+
+  background:var(--card2);
+
+  border:2px solid var(--border);
+  border-radius:14px;
+
+  color:var(--text);
+
+  cursor:pointer;
+
+  transition:all 0.25s ease;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.quick-select button:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+  background:rgba(41,199,172,0.05);
+
+  transform:translateY(-2px);
+}
+
+.quick-select button:active{
+  transform:scale(0.95);
+}
+
+/* selected sizes wrapper */
+.chips#sizes-input{
+  margin-top:20px;
+  padding:10px;
+  border-top:1px dashed var(--border);
+}
+
+/* color picker */
+.color-picker-wrapper{
+  display:flex;
+  gap:10px;
+  background:var(--card);
+  padding:10px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  align-items:center;
+}
+
+input[type="color"]{
+  -webkit-appearance:none;
+  border:none;
+  width:40px;
+  height:40px;
+  cursor:pointer;
+  background:none;
+}
+
+input[type="color"]::-webkit-color-swatch{
+  border-radius:10px;
+  border:2px solid var(--border);
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:scale(0.9);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}

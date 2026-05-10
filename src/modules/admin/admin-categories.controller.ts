@@ -1,19 +1,20 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Delete, 
-  Param, 
-  Body, 
-  UseGuards, 
-  UseInterceptors, 
-  UploadedFile, 
-  BadRequestException 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AdminGuard } from '../../common/guards/admin.guard';
@@ -21,83 +22,79 @@ import { AdminCategoriesService } from './admin-categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
-@Controller('admin/categories')
+@ApiTags('Admin Categories')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, AdminGuard)
+@Controller('admin/categories')
 export class AdminCategoriesController {
   constructor(private readonly adminCategoriesService: AdminCategoriesService) {}
 
-  // --- جلب جميع التصنيفات ---
   @Get()
+  @ApiOperation({ summary: 'جلب كل التصنيفات' })
+  @ApiResponse({ status: 200, description: 'تم جلب التصنيفات بنجاح' })
   async list() {
     return this.adminCategoriesService.list();
   }
+@Get(':id')
+@ApiOperation({ summary: 'جلب تصنيف واحد' })
+@ApiParam({ name: 'id', type: 'string' })
+async getOne(@Param('id') id: string) {
+  return this.adminCategoriesService.findOne(id);
+}
 
-  // --- إنشاء تصنيف جديد مع رفع صورة ---
   @Post()
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/categories',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, `category-${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-          return callback(new BadRequestException('Only image files are allowed!'), false);
-        }
-        callback(null, true);
+  @ApiConsumes('multipart/form-data')
+@UseInterceptors(
+  FilesInterceptor('files', 10, {
+    storage: diskStorage({
+      destination: './uploads/products',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname));
       },
     }),
-  )
+  }),
+)  @ApiOperation({ summary: 'إنشاء تصنيف جديد مع صورة' })
+  @ApiResponse({ status: 201, description: 'تم إنشاء التصنيف بنجاح' })
   async create(
     @UploadedFile() file: Express.Multer.File,
     @Body() payload: CreateCategoryDto,
   ) {
-    if (!file) {
-      throw new BadRequestException('Category image is required');
-    }
-
-    // تجهيز مسار الصورة للتخزين في قاعدة البيانات
+    if (!file) throw new BadRequestException('Category image is required');
     const imageUrl = `/uploads/categories/${file.filename}`;
-    
-    return this.adminCategoriesService.create({
-      ...payload,
-      image: imageUrl,
-    });
+
+    return this.adminCategoriesService.create({ ...payload, image: imageUrl });
   }
 
-  // --- تحديث تصنيف (مع صورة اختيارية) ---
-  @Put(':id')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/categories',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, `category-update-${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
+@Put(':id')
+@ApiConsumes('multipart/form-data')
+@UseInterceptors(
+  FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/categories',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, 'category-' + uniqueSuffix + extname(file.originalname));
+      },
     }),
-  )
-  async update(
-    @Param('id') id: string,
-    @Body() payload: UpdateCategoryDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    const updateData = { ...payload };
+  }),
+)
+@ApiOperation({ summary: 'تحديث تصنيف' })
+@ApiParam({ name: 'id', type: 'string' })
+async update(
+  @Param('id') id: string,
+  @Body() payload: UpdateCategoryDto,
+  @UploadedFile() file?: Express.Multer.File,
+) {
+  const updateData = { ...payload };
+  if (file) updateData.image = `/uploads/categories/${file.filename}`;
+  return this.adminCategoriesService.update(id, updateData);
+}
 
-    // إذا قام المستخدم برفع صورة جديدة، نحدث المسار
-    if (file) {
-      updateData.image = `/uploads/categories/${file.filename}`;
-    }
-
-    return this.adminCategoriesService.update(id, updateData);
-  }
-
-  // --- حذف تصنيف ---
   @Delete(':id')
+  @ApiOperation({ summary: 'حذف تصنيف' })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiResponse({ status: 200, description: 'تم حذف التصنيف بنجاح' })
   async remove(@Param('id') id: string) {
     return this.adminCategoriesService.remove(id);
   }

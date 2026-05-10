@@ -13,6 +13,30 @@ export class AdminOrdersService {
     private readonly ordersRepository: Repository<Order>,
   ) {}
 
+  // ── helper مشترك لجلب طلب بكل relations ──
+  private async fetchWithRelations(id: string): Promise<Order> {
+    const order = await this.ordersRepository.findOne({
+      where: { id },
+      relations: {
+        user: true,
+        deliveryInfo: true,
+        orderItems: {
+          product: { priceTags: true, categories: true },
+          priceTag: { product: true },
+        },
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
+  }
+
+  // ✅ findOne — يرجع { data: ... } عشان Refine يقراه صح
+  async findOne(id: string) {
+    const order = await this.fetchWithRelations(id);
+    return { data: mapAdminOrder(order) };
+  }
+
   async list() {
     const orders = await this.ordersRepository.find({
       relations: {
@@ -30,25 +54,12 @@ export class AdminOrdersService {
   }
 
   async updateStatus(id: string, payload: UpdateOrderStatusDto) {
-    const order = await this.ordersRepository.findOne({
-      where: { id },
-      relations: {
-        user: true,
-        deliveryInfo: true,
-        orderItems: {
-          product: { priceTags: true, categories: true },
-          priceTag: { product: true },
-        },
-      },
-    });
-
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-
+    const order = await this.fetchWithRelations(id);
     order.orderStatus = payload.orderStatus;
-    const saved = await this.ordersRepository.save(order);
+    await this.ordersRepository.save(order);
 
-    return mapAdminOrder(saved);
+    // ── نجيب الـ order تاني بعد الحفظ عشان العلاقات تكون محدثة ──
+    const updated = await this.fetchWithRelations(id);
+    return { data: mapAdminOrder(updated) };
   }
 }

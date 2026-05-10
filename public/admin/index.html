@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>EShop Admin Panel</title>
+
+  <link
+    rel="stylesheet"
+    href="./styles/main.css"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div id="sidebar-container"></div>
+
+    <main class="main">
+
+      <div id="topbar-container"></div>
+
+      <div id="dashboard-container"></div>
+      <div id="products-container"></div>
+      <div id="categories-container"></div>
+      <div id="orders-container"></div>
+      <div id="users-container"></div>
+
+    </main>
+
+  </div>
+
+  <!-- MODALS -->
+  <div id="product-modal-container"></div>
+  <div id="category-modal-container"></div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- ==================== Scripts ==================== -->
+  
+  <!-- أولاً: تحميل الـ Partials -->
+  <script type="module" src="./js/loadPartials.js" defer></script>
+  
+  <!-- ثانياً: الـ Main App (مهم جداً) -->
+  <script type="module" src="./js/app.js" defer></script>
+
+</body>
+</html>

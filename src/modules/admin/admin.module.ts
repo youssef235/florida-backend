@@ -3,13 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '../auth/auth.module';
 import { Category } from '../../entities/category.entity';
+import { DeliveryInfo } from '../../entities/delivery-info.entity';  // ✅ مفقود
 import { Order } from '../../entities/order.entity';
+import { OrderItem } from '../../entities/order-item.entity';         // ✅ مفقود
 import { PriceTag } from '../../entities/price-tag.entity';
 import { Product } from '../../entities/product.entity';
 import { User } from '../../entities/user.entity';
+
 import { AdminAuthController } from './admin-auth.controller';
-
-
 import { AdminAuthService } from './admin-auth.service';
 import { AdminCategoriesController } from './admin-categories.controller';
 import { AdminCategoriesService } from './admin-categories.service';
@@ -25,7 +26,15 @@ import { AdminUsersService } from './admin-users.service';
 @Module({
   imports: [
     AuthModule,
-    TypeOrmModule.forFeature([User, Product, Category, PriceTag, Order]),
+    TypeOrmModule.forFeature([
+      User,
+      Product,
+      Category,
+      PriceTag,
+      Order,
+      OrderItem,    // ✅
+      DeliveryInfo, // ✅
+    ]),
   ],
   controllers: [
     AdminAuthController,

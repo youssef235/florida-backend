@@ -1,11 +1,14 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCategoryDto {
-  @IsNotEmpty({ message: 'اسم القسم مطلوب' })
+  @ApiProperty({ example: 'ملابس رجالي' })
+  @IsNotEmpty()
   @IsString()
   name!: string;
 
-  @IsOptional() // 👈 غيرها من @IsNotEmpty إلى @IsOptional
+  @ApiPropertyOptional({ example: '/uploads/categories/123.jpg' })
+  @IsOptional()
   @IsString()
   image?: string;
 }

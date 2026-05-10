@@ -1,0 +1,83 @@
+<div
+  class="modal hidden"
+  id="category-modal"
+>
+
+  <div class="modal-content">
+
+    <div class="modal-header">
+
+      <h2>
+        Category Editor
+      </h2>
+
+      <button
+        class="close-modal"
+        id="close-category-modal"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <form id="category-form">
+
+      <input
+        type="hidden"
+        name="categoryId"
+      />
+
+      <label>
+
+        Category Name
+
+        <input
+          type="text"
+          name="name"
+          required
+        />
+
+      </label>
+
+      <label class="upload-box">
+
+        <input
+          type="file"
+          id="category-image"
+          accept="image/*"
+          hidden
+        />
+
+        <div class="upload-content">
+
+          <i class="fa-solid fa-image"></i>
+
+          <span>
+            Upload Category Image
+          </span>
+
+        </div>
+
+      </label>
+
+      <div
+        id="category-preview"
+        class="image-preview"
+      ></div>
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="primary-btn"
+        >
+          Save Category
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

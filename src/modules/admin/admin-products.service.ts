@@ -27,38 +27,39 @@ export class AdminProductsService {
     private readonly priceTagsRepository: Repository<PriceTag>,
   ) {}
 
-async list(query: ProductQuery) {
-  const page = Number(query.page ?? 0) || 0;
-  const pageSize = Number(query.pageSize ?? 10) || 10;
+  async list(query: ProductQuery) {
+    const page = Number(query.page ?? 0) || 0;
+    const pageSize = Number(query.pageSize ?? 10) || 10;
 
-  const qb = this.productsRepository
-    .createQueryBuilder('product')
-    .leftJoinAndSelect('product.priceTags', 'priceTags')
-    .leftJoinAndSelect('product.categories', 'categories')
-    .orderBy('product.createdAt', 'DESC')
-    .skip(page * pageSize)
-    .take(pageSize);
+    const qb = this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.priceTags', 'priceTags')
+      .leftJoinAndSelect('product.categories', 'categories')
+      .orderBy('product.createdAt', 'DESC')
+      .skip(page * pageSize)
+      .take(pageSize);
 
-  if (query.keyword) {
-    qb.andWhere('LOWER(product.name) LIKE :keyword', {
-      keyword: `%${query.keyword.toLowerCase()}%`,
-    });
-  }
-
-  if (query.categories) {
-    const ids = JSON.parse(query.categories || '[]');
-    if (ids.length > 0) {
-      qb.andWhere('categories.id IN (:...ids)', { ids });
+    if (query.keyword) {
+      qb.andWhere('LOWER(product.name) LIKE :keyword', {
+        keyword: `%${query.keyword.toLowerCase()}%`,
+      });
     }
+
+    if (query.categories) {
+      const ids = JSON.parse(query.categories || '[]');
+      if (ids.length > 0) {
+        qb.andWhere('categories.id IN (:...ids)', { ids });
+      }
+    }
+
+    const [products, total] = await qb.getManyAndCount();
+
+    return {
+      meta: { page, pageSize, total },
+      data: products.map(mapProduct),
+    };
   }
 
-  const [products, total] = await qb.getManyAndCount();
-
-  return {
-    meta: { page, pageSize, total },
-    data: products.map(mapProduct),
-  };
-}
   async findOne(id: string) {
     const product = await this.productsRepository.findOne({
       where: { id },
@@ -73,92 +74,83 @@ async list(query: ProductQuery) {
   }
 
 async create(payload: CreateProductDto) {
-  // 1. جلب الأقسام
   const categories = payload.categories?.length
     ? await this.categoriesRepository.find({
         where: { id: In(payload.categories) },
       })
     : [];
 
-  // 2. إنشاء كائن المنتج (بدون حفظ الأسعار بعد)
   const product = this.productsRepository.create({
     name: payload.name,
     description: payload.description,
     images: payload.images ?? [],
-    categories: categories,
+    sizes: payload.sizes ?? [],
+    colors: payload.colors ?? [],
+    categories,
     isFeatured: payload.isFeatured ?? false,
     hasDiscount: payload.hasDiscount ?? false,
     season: payload.season,
   });
 
-  // 3. حفظ المنتج أولاً للحصول على الـ ID
   const savedProduct = await this.productsRepository.save(product);
 
-  // 4. إنشاء وحفظ الأسعار مرتبطة بالمنتج المحفوظ
-  if (payload.priceTags && payload.priceTags.length > 0) {
+  if (payload.priceTags?.length) {
     const priceTags = payload.priceTags.map((tag) =>
       this.priceTagsRepository.create({
         name: tag.name,
         price: tag.price,
-        product: savedProduct, // نستخدم الكائن المحفوظ
+        product: savedProduct,
       }),
-      
     );
+    // ✅ احفظ الـ priceTags
     await this.priceTagsRepository.save(priceTags);
   }
 
   return this.findOne(savedProduct.id);
 }
+  async update(id: string, payload: UpdateProductDto) {
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: { priceTags: true, categories: true },
+    });
 
-async update(id: string, payload: UpdateProductDto) {
-  const product = await this.productsRepository.findOne({
-    where: { id },
-    relations: { priceTags: true, categories: true },
-  });
-
-  if (!product) {
-    throw new NotFoundException('Product not found');
-  }
-
-  // تحديث الحقول الأساسية فقط إذا تم إرسالها
-  if (payload.name !== undefined) product.name = payload.name;
-  if (payload.description !== undefined) product.description = payload.description;
-  if (payload.images !== undefined) product.images = payload.images;
-  if (payload.isFeatured !== undefined) product.isFeatured = payload.isFeatured;
-  if (payload.hasDiscount !== undefined) product.hasDiscount = payload.hasDiscount;
-  if (payload.season !== undefined) product.season = payload.season;
-
-  // تحديث الأقسام
-  if (payload.categories !== undefined) {
-    product.categories = payload.categories.length
-      ? await this.categoriesRepository.find({ where: { id: In(payload.categories) } })
-      : [];
-  }
-
-  // تحديث الأسعار (الطريقة الآمنة)
-  if (payload.priceTags !== undefined) {
-    // حذف القديم
-    await this.priceTagsRepository.delete({ product: { id: product.id } });
-    
-    // إنشاء الجديد إذا كانت المصفوفة ليست فارغة
-    if (payload.priceTags.length > 0) {
-        const newTags = payload.priceTags.map((tag) =>
-          this.priceTagsRepository.create({
-            name: tag.name,
-            price: tag.price,
-            product: product,
-          }),
-        );
-        product.priceTags = newTags;
-    } else {
-        product.priceTags = [];
+    if (!product) {
+      throw new NotFoundException('Product not found');
     }
-  }
 
-  // الحفظ النهائي
-  await this.productsRepository.save(product);
-  return this.findOne(id);
-}
+    if (payload.name !== undefined) product.name = payload.name;
+    if (payload.description !== undefined) product.description = payload.description;
+    if (payload.images !== undefined) product.images = payload.images;
+    if (payload.sizes !== undefined) product.sizes = payload.sizes;
+    if (payload.colors !== undefined) product.colors = payload.colors;
+    if (payload.isFeatured !== undefined) product.isFeatured = payload.isFeatured;
+    if (payload.hasDiscount !== undefined) product.hasDiscount = payload.hasDiscount;
+    if (payload.season !== undefined) product.season = payload.season;
+
+    if (payload.categories !== undefined) {
+      product.categories = payload.categories.length
+        ? await this.categoriesRepository.find({
+            where: { id: In(payload.categories) },
+          })
+        : [];
+    }
+
+    if (payload.priceTags !== undefined) {
+      await this.priceTagsRepository.delete({ product: { id: product.id } });
+      product.priceTags = payload.priceTags.length
+        ? payload.priceTags.map((tag) =>
+            this.priceTagsRepository.create({
+              name: tag.name,
+              price: tag.price,
+              product,
+            }),
+          )
+        : [];
+    }
+
+    await this.productsRepository.save(product);
+    return this.findOne(id);
+  }
 
   async remove(id: string) {
     const product = await this.productsRepository.findOne({ where: { id } });

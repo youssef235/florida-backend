@@ -15,9 +15,8 @@ export class OrderItem {
   @ManyToOne(() => Product, { eager: false })
   product!  : Product;
 
-  @ManyToOne(() => PriceTag, { eager: false })
-  priceTag!: PriceTag;
-
+@ManyToOne(() => PriceTag, { eager: false, nullable: true, onDelete: 'SET NULL' })
+priceTag!: PriceTag | null;
   @Column({ type: 'double precision' })
   price!: number;
 

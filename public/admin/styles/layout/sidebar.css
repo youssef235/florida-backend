@@ -1,0 +1,108 @@
+/* =========================
+   MODERN SIDEBAR (Aligned with Products CSS)
+========================= */
+
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  position: fixed;
+/* التعديل هنا */
+  right: 0; /* بدلاً من left: 0 */
+  left: auto;
+  
+  /* تماشياً مع الـ product-card */
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+/* Logo Area - بنفس روح الـ badge */
+.logo-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #29c7ac, #3ca6ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(41, 199, 172, 0.3);
+}
+
+/* الأزرار - هنا التغيير الجذري */
+.sidebar-nav {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.03); /* شفافية بسيطة */
+  border: 1px solid transparent;
+  padding: 14px 18px;
+  border-radius: 18px; /* زوايا دائرية عصرية */
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Hover - مستوحى من icon-btn hover */
+.tab-btn:hover {
+  background: rgba(41, 199, 172, 0.1);
+  color: #67ffe0;
+  border-color: rgba(41, 199, 172, 0.2);
+  transform: translateX(5px); /* حركة بسيطة لليمين */
+}
+
+/* Active - مستوحى من الـ badge featured */
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(41, 199, 172, 0.2), rgba(41, 199, 172, 0.05));
+  border-color: rgba(41, 199, 172, 0.4);
+  color: #67ffe0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Logout Button - بنفس شكل الـ icon-btn لكن أحمر */
+.logout-btn {
+  margin-top: 20px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  padding: 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+/* Admin Profile Box */
+.admin-profile {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 10px;
+}

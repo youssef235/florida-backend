@@ -13,6 +13,11 @@ import { Category } from './category.entity';
 import { PriceTag } from './price-tag.entity';
 import { User } from './user.entity';
 
+export interface ProductColor {
+  name: string;
+  hex: string;
+}
+
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn('uuid')
@@ -26,20 +31,24 @@ export class Product {
 
   @Column({ type: 'text', array: true })
   images!: string[];
-@ManyToMany(() => Category, (category) => category.products)
-@JoinTable({
-  name: 'product_categories',
-  joinColumn: { name: 'product_id', referencedColumnName: 'id' },
-  inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
-})
-categories!: Category[];
+
+  @Column({ type: 'text', array: true, default: '{}' })
+  sizes!: string[];
+
+  @Column({ type: 'jsonb', default: '[]' })
+  colors!: ProductColor[];
+
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable({
+    name: 'product_categories',
+    joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+  })
+  categories!: Category[];
 
   @OneToMany(() => PriceTag, (priceTag) => priceTag.product, { cascade: true })
   priceTags!: PriceTag[];
 
-  // =====================
-  // FEATURE FLAGS
-  // =====================
   @Column({ type: 'boolean', default: false })
   isFeatured!: boolean;
 
@@ -49,16 +58,8 @@ categories!: Category[];
   @Column({ type: 'varchar', nullable: true })
   season!: 'summer' | 'winter' | null;
 
-  // =====================
-  // ❤️ WISHLIST USERS
-  // =====================
-@ManyToMany(() => User, (user) => user.wishlist)
-@JoinTable({
-  name: 'wishlist',
-  joinColumn: { name: 'product_id', referencedColumnName: 'id' },
-  inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-})
-wishlistUsers!: User[];
+  @ManyToMany(() => User, (user) => user.wishlist)
+  wishlistUsers!: User[];
 
   @CreateDateColumn()
   createdAt!: Date;

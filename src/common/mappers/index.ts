@@ -25,6 +25,10 @@ export const mapProduct = (product: Product) => ({
   name: product.name,
   description: product.description,
   hasDiscount: product.hasDiscount ?? false,
+  isFeatured: product.isFeatured ?? false,
+  season: product.season ?? null,
+  sizes: product.sizes ?? [],
+  colors: product.colors ?? [],
   priceTags: (product.priceTags ?? []).map(mapPriceTag),
   categories: (product.categories ?? []).map(mapCategory),
   images: product.images ?? [],
@@ -36,10 +40,11 @@ export const mapCartItem = (cartItem: CartItem) => ({
   _id: cartItem.id,
   product: mapProduct(cartItem.product),
   priceTag: mapPriceTag(cartItem.priceTag),
-  quantity: cartItem.quantity, 
-  size: cartItem.size,     // ✅ أضف السطر ده
-  color: cartItem.color,   // ✅ أضف السطر ده
+  quantity: cartItem.quantity,
+  size: cartItem.size,
+  color: cartItem.color,
 });
+
 export const mapDeliveryInfo = (deliveryInfo: DeliveryInfo) => ({
   _id: deliveryInfo.id,
   firstName: deliveryInfo.firstName,
@@ -54,7 +59,7 @@ export const mapDeliveryInfo = (deliveryInfo: DeliveryInfo) => ({
 export const mapOrderItem = (orderItem: OrderItem) => ({
   _id: orderItem.id,
   product: mapProduct(orderItem.product),
-  priceTag: mapPriceTag(orderItem.priceTag),
+  priceTag: orderItem.priceTag ? mapPriceTag(orderItem.priceTag) : null,
   price: Number(orderItem.price),
   quantity: orderItem.quantity,
 });
@@ -82,10 +87,13 @@ export const mapAdminUser = (user: User) => ({
 });
 
 export const mapAdminOrder = (order: Order) => ({
+  // ✅ Refine بيدور على `id` عشان يعمل getOne وshow
+  // بنرجع الاتنين عشان نضمن التوافق
+  id: order.id,
   _id: order.id,
   user: order.user ? mapUser(order.user) : null,
   orderItems: (order.orderItems ?? []).map(mapOrderItem),
-  deliveryInfo: mapDeliveryInfo(order.deliveryInfo),
+  deliveryInfo: order.deliveryInfo ? mapDeliveryInfo(order.deliveryInfo) : null,
   discount: Number(order.discount),
   orderStatus: order.orderStatus,
   createdAt: order.createdAt,

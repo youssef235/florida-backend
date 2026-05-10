@@ -1,0 +1,25 @@
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.hidden{
+  display:none;
+}
+
+.modal-content{
+  width:min(900px,95%);
+  max-height:95vh;
+  overflow:auto;
+
+  background:var(--card2);
+
+  border-radius:30px;
+
+  padding:30px;
+}

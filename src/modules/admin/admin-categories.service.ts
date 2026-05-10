@@ -21,7 +21,11 @@ export class AdminCategoriesService {
 
     return { data: categories.map(mapCategory) };
   }
-
+async findOne(id: string) {
+  const category = await this.categoriesRepository.findOne({ where: { id } });
+  if (!category) throw new NotFoundException('Category not found');
+  return mapCategory(category);
+}
   async create(payload: CreateCategoryDto) {
     const category = this.categoriesRepository.create({
       name: payload.name,
