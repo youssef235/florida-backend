@@ -14,8 +14,11 @@ export class DeliveryInfo {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => User, (user) => user.deliveryInfos, { onDelete: 'CASCADE' })
-  user!: User;
+  @ManyToOne(() => User, (user) => user.deliveryInfos, { 
+    onDelete: 'CASCADE',
+    nullable: true  // ✅ جعله nullable
+  })
+  user?: User | null;  // ✅ تغيير من user! إلى user?
 
   @Column({ type: 'varchar', length: 120 })
   firstName!: string;
@@ -25,15 +28,15 @@ export class DeliveryInfo {
 
   @Column({ type: 'varchar', length: 255 })
   addressLineOne!: string;
-// ✅ بعد
-@Column({ type: 'varchar', length: 255, nullable: true })
-addressLineTwo?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  addressLineTwo?: string;
 
   @Column({ type: 'varchar', length: 120 })
   city!: string;
 
-  @Column({ type: 'varchar', length: 40 })
-  zipCode!: string;
+@Column({ type: 'varchar', length: 40, nullable: true })
+zipCode?: string;
 
   @Column({ type: 'varchar', length: 40 })
   contactNumber!: string;

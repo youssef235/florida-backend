@@ -60,10 +60,8 @@ async getOne(@Param('id') id: string) {
     @UploadedFile() file: Express.Multer.File,
     @Body() payload: CreateCategoryDto,
   ) {
-    if (!file) throw new BadRequestException('Category image is required');
-    const imageUrl = `/uploads/categories/${file.filename}`;
-
-    return this.adminCategoriesService.create({ ...payload, image: imageUrl });
+const imageUrl = file ? `/uploads/categories/${file.filename}` : undefined;
+return this.adminCategoriesService.create({ ...payload, image: imageUrl });
   }
 
 @Put(':id')

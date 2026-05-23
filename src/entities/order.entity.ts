@@ -16,8 +16,11 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
-  user!       : User;
+  @ManyToOne(() => User, (user) => user.orders, { 
+    onDelete: 'CASCADE', 
+    nullable: true
+  })
+  user?: User | null;
 
   @ManyToOne(() => DeliveryInfo, { eager: false })
   deliveryInfo!: DeliveryInfo;
@@ -25,7 +28,7 @@ export class Order {
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
     cascade: true,
   })
-  orderItems! : OrderItem[];
+  orderItems!: OrderItem[];
 
   @Column({ type: 'double precision', default: 0 })
   discount!: number;
@@ -33,6 +36,15 @@ export class Order {
   @Column({ type: 'int', default: 0 })
   orderStatus!: number;
 
+  @Column({ default: false })
+  isGuest!: boolean;
+
+  @Column({ nullable: true })  // ✅ جديد
+  paymentMethod?: string;
+
+  @Column({ type: 'double precision', nullable: true })  // ✅ جديد
+  totalAmount?: number;
+
   @CreateDateColumn()
-  createdAt!  : Date;
+  createdAt!: Date;
 }

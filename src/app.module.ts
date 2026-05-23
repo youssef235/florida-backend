@@ -24,83 +24,48 @@ import { AdminModule } from './modules/admin/admin.module';
 import { BannerModule } from './modules/banner/banner.module';
 import { WishlistModule } from './modules/products/Wishlist Module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // OLD HTML/CSS/JS DASHBOARD
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'public', 'admin'),
       serveRoot: '/old-admin',
     }),
 
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-
-        host: config.get<string>('DB_HOST', 'localhost'),
-
-        port: Number(
-          config.get<string>('DB_PORT', '5432'),
-        ),
-
-        username: config.get<string>(
-          'DB_USER',
-          'postgres',
-        ),
-
-        password: config.get<string>(
-          'DB_PASSWORD',
-          'postgres',
-        ),
-
-        database: config.get<string>(
-          'DB_NAME',
-          'eshop',
-        ),
-
-        entities: [
-          User,
-          Category,
-          Product,
-          PriceTag,
-          CartItem,
-          DeliveryInfo,
-          Order,
-          OrderItem,
-          Banner,
-        ],
-
-        synchronize:
-          config.get<string>(
-            'DB_SYNC',
-            'true',
-          ) === 'true',
-      }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'aws-0-eu-west-1.pooler.supabase.com',
+      port: 5432,
+      username: 'postgres.ejvjcbxvdagozzgvykgj',
+      password: 'FlutterDeveloper_1',
+      database: 'postgres',
+      ssl: { rejectUnauthorized: false },
+      entities: [
+        User,
+        Category,
+        Product,
+        PriceTag,
+        CartItem,
+        DeliveryInfo,
+        Order,
+        OrderItem,
+        Banner,
+      ],
+      synchronize: true,
     }),
 
     AuthModule,
-
     CategoriesModule,
-
     ProductsModule,
-
     CartsModule,
-
     DeliveryInfoModule,
-
     OrdersModule,
-
     AdminModule,
-
     WishlistModule,
-
-    BannerModule
-
+    BannerModule,
   ],
 })
 export class AppModule {}

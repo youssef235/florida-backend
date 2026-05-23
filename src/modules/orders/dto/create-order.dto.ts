@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class CreateOrderItemDto {
   @IsNotEmpty()
@@ -15,11 +15,18 @@ export class CreateOrderItemDto {
   @IsNumber()
   @Type(() => Number)
   quantity!: number;
+
+  @IsOptional()
+  @IsString()
+  size?: string;
+
+  @IsOptional()
+  @IsString()
+  color?: string;
 }
 
-// ✅ بيانات الشحن مباشرة بدون ID
 export class DeliveryInfoDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'First name is required' })
   firstName!: string;
 
   @IsNotEmpty()
@@ -29,14 +36,13 @@ export class DeliveryInfoDto {
   addressLineOne!: string;
 
   @IsOptional()
-  @IsString()
   addressLineTwo?: string;
 
   @IsNotEmpty()
   city!: string;
 
-  @IsNotEmpty()
-  zipCode!: string;
+  @IsOptional()
+  zipCode?: string;
 
   @IsNotEmpty()
   contactNumber!: string;
@@ -50,10 +56,21 @@ export class CreateOrderDto {
 
   @ValidateNested()
   @Type(() => DeliveryInfoDto)
-  deliveryInfo!: DeliveryInfoDto;   // ✅ object مباشرة مش ID
+  deliveryInfo!: DeliveryInfoDto;
+
+  @IsString()
+  @IsNotEmpty()
+  paymentMethod!: string;
 
   @IsNumber()
   @Type(() => Number)
+  totalAmount!: number;
+
+  @IsNumber()
   @IsOptional()
-  discount?: number;
+  discount?: number = 0;
+
+  @IsBoolean()
+  @IsOptional()
+  isGuest?: boolean = true;
 }

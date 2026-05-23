@@ -13,13 +13,21 @@ export class OrderItem {
   order!: Order;
 
   @ManyToOne(() => Product, { eager: false })
-  product!  : Product;
+  product!: Product;
 
-@ManyToOne(() => PriceTag, { eager: false, nullable: true, onDelete: 'SET NULL' })
-priceTag!: PriceTag | null;
+  @ManyToOne(() => PriceTag, { eager: false, nullable: true, onDelete: 'SET NULL' })
+  priceTag!: PriceTag | null;
+
   @Column({ type: 'double precision' })
   price!: number;
 
   @Column({ type: 'int' })
-  quantity! : number;
+  quantity!: number;
+
+  // ← إضافات جديدة
+  @Column({ nullable: true })
+  size?: string;
+
+  @Column({ nullable: true })
+  color?: string;
 }

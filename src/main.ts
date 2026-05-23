@@ -1,35 +1,37 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as express from 'express';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // CORS
-app.enableCors({
-  origin: (_origin, callback) => callback(null, true),
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
-  credentials: false,
-});
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
+  app.setGlobalPrefix('api');
 
-  // Static uploads
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
+  // ✅ رفع حد حجم الـ body إلى 20MB (ضروري لرفع الصور)
+  app.use(express.json({ limit: '20mb' }));
+  app.use(express.urlencoded({ limit: '20mb', extended: true }));
+
+  app.enableCors({
+    origin: (_origin: any, callback: any) => callback(null, true),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+    credentials: false,
   });
 
-  // 🔥 Swagger Configuration محسنة
-  // 🔥 Swagger Configuration (محسنة)
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+  }));
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/api/uploads/',
+  });
+
   const config = new DocumentBuilder()
     .setTitle('E-Commerce Admin API')
     .setDescription('Full API Documentation')
@@ -41,18 +43,16 @@ app.enableCors({
     deepScanRoutes: true,
   });
 
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       defaultModelsExpandDepth: 3,
       defaultModelExpandDepth: 3,
     },
   });
-  const port = process.env.PORT || 4000;
-  await app.listen(port);
 
-  console.log(`🚀 Server: http://localhost:${port}`);
-  console.log(`📘 Swagger: http://localhost:${port}/api`);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.error(`=== SERVER RUNNING ON PORT ${port} ===`);
 }
-
 bootstrap();

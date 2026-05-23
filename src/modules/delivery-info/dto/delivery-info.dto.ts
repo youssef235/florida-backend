@@ -19,8 +19,8 @@ export class DeliveryInfoDto {
   @IsNotEmpty()
   city!: string;
 
-  @IsNotEmpty()
-  zipCode!: string;
+@IsOptional()
+zipCode?: string;
 
   @IsNotEmpty()
   contactNumber!: string;

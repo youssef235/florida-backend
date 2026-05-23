@@ -26,6 +26,7 @@ export class OrdersService {
     private readonly deliveryInfoRepository: Repository<DeliveryInfo>,
   ) {}
 
+  // ✅ للمستخدم المسجل
   async getOrders(user: User) {
     const orders = await this.ordersRepository.find({
       where: { user: { id: user.id } },
@@ -42,63 +43,87 @@ export class OrdersService {
     return orders.map(mapOrder);
   }
 
-  async createOrder(user: User, payload: CreateOrderDto) {
-  // ✅ ينشئ delivery info تلقائياً
-  const deliveryInfo = this.deliveryInfoRepository.create({
-    ...payload.deliveryInfo,
-    user,
-  });
-  await this.deliveryInfoRepository.save(deliveryInfo);
-
-  const orderItems: OrderItem[] = [];
-
-  for (const item of payload.orderItems) {
-    const product = await this.productsRepository.findOne({
-      where: { id: item.product },
-      relations: { priceTags: true, categories: true },
-    });
-    const priceTag = await this.priceTagsRepository.findOne({
-      where: { id: item.priceTag },
-      relations: { product: true },
+  // ✅ جديد: للـ Guest - البحث برقم الهاتف
+  async getGuestOrders(contactNumber: string) {
+    const orders = await this.ordersRepository.find({
+      where: {
+        isGuest: true,
+        deliveryInfo: { contactNumber },
+      },
+      relations: {
+        deliveryInfo: true,
+        orderItems: {
+          product: { priceTags: true, categories: true },
+          priceTag: { product: true },
+        },
+      },
+      order: { createdAt: 'DESC' },
     });
 
-    if (!product || !priceTag) {
-      throw new BadRequestException('Invalid order item');
-    }
-
-    const orderItem = this.orderItemsRepository.create({
-      product,
-      priceTag,
-      price: item.price,
-      quantity: item.quantity,
-    });
-
-    orderItems.push(orderItem);
+    return orders.map(mapOrder);
   }
 
-  const order = this.ordersRepository.create({
-    user,
-    deliveryInfo,
-    discount: payload.discount ?? 0,
-    orderStatus: 0,
-    orderItems,
-  });
+  async createOrder(user: User | null, payload: CreateOrderDto) {
+    const deliveryInfo = this.deliveryInfoRepository.create({
+      ...payload.deliveryInfo,
+      user,
+    });
+    await this.deliveryInfoRepository.save(deliveryInfo);
 
-  orderItems.forEach((item) => { item.order = order; });
+    const orderItems: OrderItem[] = [];
 
-  const saved = await this.ordersRepository.save(order);
+    for (const item of payload.orderItems) {
+      const product = await this.productsRepository.findOne({
+        where: { id: item.product },
+        relations: { priceTags: true, categories: true },
+      });
+      const priceTag = await this.priceTagsRepository.findOne({
+        where: { id: item.priceTag },
+        relations: { product: true },
+      });
 
-  const hydrated = await this.ordersRepository.findOne({
-    where: { id: saved.id },
-    relations: {
-      deliveryInfo: true,
-      orderItems: {
-        product: { priceTags: true, categories: true },
-        priceTag: { product: true },
+      if (!product || !priceTag) {
+        throw new BadRequestException('Invalid order item');
+      }
+
+      const orderItem = this.orderItemsRepository.create({
+        product,
+        priceTag,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,    // ✅ أضفنا الحقول الجديدة
+        color: item.color,
+      });
+
+      orderItems.push(orderItem);
+    }
+
+    const order = this.ordersRepository.create({
+      user,
+      deliveryInfo,
+      discount: payload.discount ?? 0,
+      orderStatus: 0,
+      isGuest: payload.isGuest ?? true,
+      paymentMethod: payload.paymentMethod,  // ✅ أضفنا paymentMethod
+      totalAmount: payload.totalAmount,      // ✅ أضفنا totalAmount
+      orderItems,
+    });
+
+    orderItems.forEach((item) => { item.order = order; });
+
+    const saved = await this.ordersRepository.save(order);
+
+    const hydrated = await this.ordersRepository.findOne({
+      where: { id: saved.id },
+      relations: {
+        deliveryInfo: true,
+        orderItems: {
+          product: { priceTags: true, categories: true },
+          priceTag: { product: true },
+        },
       },
-    },
-  });
+    });
 
-  return mapOrder(hydrated ?? saved as Order);
-}
+    return mapOrder(hydrated ?? saved as Order);
+  }
 }

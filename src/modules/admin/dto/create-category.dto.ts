@@ -7,7 +7,12 @@ export class CreateCategoryDto {
   @IsString()
   name!: string;
 
-  @ApiPropertyOptional({ example: '/uploads/categories/123.jpg' })
+  @ApiPropertyOptional({ example: 'Men Clothing' })
+  @IsOptional()
+  @IsString()
+  nameEn?: string;
+
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   image?: string;

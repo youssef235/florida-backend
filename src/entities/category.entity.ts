@@ -10,8 +10,11 @@ export class Category {
   @Column({ type: 'varchar', length: 160 })
   name!: string;
 
-  @Column({ type: 'text' })
-  image!: string;
+  @Column({ type: 'varchar', length: 160, nullable: true })
+  nameEn?: string;
+
+  @Column({ type: 'text', nullable: true })
+  image?: string;
 
   @ManyToMany(() => Product, (product) => product.categories)
   products!: Product[];

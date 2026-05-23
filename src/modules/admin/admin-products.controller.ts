@@ -16,13 +16,43 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+  ApiConsumes,
+} from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AdminGuard } from '../../common/guards/admin.guard';
 import { AdminProductsService } from './admin-products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+
+// ✅ إعدادات multer مشتركة — نعرّفها مرة واحدة ونستخدمها في أكثر من endpoint
+const multerOptions = {
+  storage: diskStorage({
+    destination: './uploads/products',
+    filename: (req: any, file: Express.Multer.File, cb: any) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + extname(file.originalname));
+    },
+  }),
+  // ✅ حد أقصى 5MB لكل صورة (الفرونت بيضغطها قبل الرفع فعلياً أقل)
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+    files: 10,
+  },
+  // ✅ رفض أي ملف مش صورة
+  fileFilter: (req: any, file: Express.Multer.File, cb: any) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new BadRequestException('فقط الصور مسموحة'), false);
+    }
+    cb(null, true);
+  },
+};
 
 @ApiTags('Admin Products')
 @ApiBearerAuth()
@@ -38,37 +68,33 @@ export class AdminProductsController {
     return this.adminProductsService.create(payload);
   }
 
+  // ✅ رفع صور مؤقتة قبل إنشاء المنتج
   @Post('upload-images')
-@ApiConsumes('multipart/form-data')
-@UseInterceptors(
-  FilesInterceptor('files', 10, {
-    storage: diskStorage({
-      destination: './uploads/products',
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + extname(file.originalname));
-      },
-    }),
-  }),
-)
-@ApiOperation({ summary: 'رفع صور مؤقتة قبل إنشاء المنتج' })
-async uploadImagesTemp(@UploadedFiles() files: Express.Multer.File[]) {
-  if (!files?.length) throw new BadRequestException('يجب رفع صورة واحدة على الأقل');
-  const imageUrls = files.map(file => `/uploads/products/${file.filename}`);
-  return { images: imageUrls };
-}
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
+  @ApiOperation({ summary: 'رفع صور مؤقتة قبل إنشاء المنتج' })
+  async uploadImagesTemp(@UploadedFiles() files: Express.Multer.File[]) {
+    if (!files?.length) {
+      throw new BadRequestException('يجب رفع صورة واحدة على الأقل');
+    }
+    const imageUrls = files.map((file) => `/uploads/products/${file.filename}`);
+    return { images: imageUrls };
+  }
 
+  // ✅ رفع صور لمنتج موجود
   @Post(':id/upload-images')
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(/* FilesInterceptor config */)
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
   @ApiOperation({ summary: 'رفع صور لمنتج موجود' })
   @ApiParam({ name: 'id', type: 'string' })
   async uploadImages(
     @Param('id') id: string,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    if (!files?.length) throw new BadRequestException('يجب رفع صورة واحدة على الأقل');
-    const imageUrls = files.map(file => `/uploads/products/${file.filename}`);
+    if (!files?.length) {
+      throw new BadRequestException('يجب رفع صورة واحدة على الأقل');
+    }
+    const imageUrls = files.map((file) => `/uploads/products/${file.filename}`);
     return this.adminProductsService.update(id, { images: imageUrls });
   }
 
